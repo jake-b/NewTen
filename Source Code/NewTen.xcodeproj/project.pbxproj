@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		232A146E1A38C039003BE85E /* TPCircularBuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 232A146C1A38C039003BE85E /* TPCircularBuffer.c */; };
 		F1B6C557091C7DCD0044B483 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
 		F1B6C558091C7DCD0044B483 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		F1B6C559091C7DCD0044B483 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = F579C4AC0227883001000104 /* Credits.rtf */; };
@@ -21,11 +22,13 @@
 /* Begin PBXFileReference section */
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		232A146C1A38C039003BE85E /* TPCircularBuffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = TPCircularBuffer.c; path = TPCircularBuffer/TPCircularBuffer.c; sourceTree = "<group>"; };
+		232A146D1A38C039003BE85E /* TPCircularBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TPCircularBuffer.h; path = TPCircularBuffer/TPCircularBuffer.h; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = SOURCE_ROOT; };
 		29B97319FDCFA39411CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = SOURCE_ROOT; };
 		F113903B050B0E0D00000103 /* Instructions.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Instructions.rtf; path = ../Instructions.rtf; sourceTree = SOURCE_ROOT; };
 		F1172C10091C7ADF0016F2FD /* Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Prefix.pch; sourceTree = "<group>"; };
-		F1B6C566091C7DCD0044B483 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Info.plist; sourceTree = "<group>"; };
+		F1B6C566091C7DCD0044B483 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F1B6C567091C7DCD0044B483 /* NewTen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NewTen.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1B6C5E7091C86C20044B483 /* NewtonConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewtonConnection.h; sourceTree = "<group>"; };
 		F1B6C5E8091C86C20044B483 /* NewtonConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewtonConnection.m; sourceTree = "<group>"; };
@@ -66,9 +69,19 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		232A146B1A38C02C003BE85E /* TPCircularBuffer */ = {
+			isa = PBXGroup;
+			children = (
+				232A146C1A38C039003BE85E /* TPCircularBuffer.c */,
+				232A146D1A38C039003BE85E /* TPCircularBuffer.h */,
+			);
+			name = TPCircularBuffer;
+			sourceTree = "<group>";
+		};
 		29B97314FDCFA39411CA2CEA /* NewTen */ = {
 			isa = PBXGroup;
 			children = (
+				232A146B1A38C02C003BE85E /* TPCircularBuffer */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -134,10 +147,19 @@
 /* Begin PBXProject section */
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0610;
+			};
 			buildConfigurationList = F1E7DECD08E3D2310012994E /* Build configuration list for PBXProject "NewTen" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* NewTen */;
 			projectDirPath = "";
+			projectRoot = "";
 			targets = (
 				F1B6C555091C7DCD0044B483 /* NewTen */,
 			);
@@ -166,6 +188,7 @@
 			files = (
 				F1B6C55D091C7DCD0044B483 /* main.m in Sources */,
 				F1B6C55E091C7DCD0044B483 /* Controller.m in Sources */,
+				232A146E1A38C039003BE85E /* TPCircularBuffer.c in Sources */,
 				F1B6C5E9091C86C20044B483 /* NewtonConnection.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -195,6 +218,7 @@
 		F1B6C564091C7DCD0044B483 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -208,11 +232,11 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = "";
-				MACOSX_DEPLOYMENT_TARGET = 10.3;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = NewTen;
-				SDKROOT = /Developer/SDKs/MacOSX10.3.9.sdk;
+				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wall";
 				WRAPPER_EXTENSION = app;
@@ -223,6 +247,7 @@
 		F1B6C565091C7DCD0044B483 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
@@ -237,7 +262,7 @@
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = NewTen;
-				SDKROOT = /Developer/SDKs/MacOSX10.3.9.sdk;
+				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wall";
 				WRAPPER_EXTENSION = app;
@@ -250,8 +275,9 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Prefix.pch;
-				MACOSX_DEPLOYMENT_TARGET = 10.2;
-				SDKROOT = /Developer/SDKs/MacOSX10.2.8.sdk;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx10.9;
 			};
 			name = Debug;
 		};
@@ -260,8 +286,8 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Prefix.pch;
-				MACOSX_DEPLOYMENT_TARGET = 10.2;
-				SDKROOT = /Developer/SDKs/MacOSX10.2.8.sdk;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				SDKROOT = macosx10.9;
 			};
 			name = Release;
 		};

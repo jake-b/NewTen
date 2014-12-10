@@ -1,3 +1,5 @@
+#include "TPCircularBuffer.h"
+
 #define MAX_HEAD_LEN 256
 #define MAX_INFO_LEN 256
 
@@ -9,6 +11,7 @@
 	int newtFD;
 	struct termios newtTTY;
 	BOOL canceled;
+    TPCircularBuffer inBuffer;
 }
 
 + (NewtonConnection*)connectionWithDevicePath:(NSString*)devicePath speed:(int)speed;
@@ -21,5 +24,6 @@
 - (void)sendLTFrame:(unsigned char*)info length:(int)infoLen seqNo:(unsigned char)seqNo;
 - (int)waitForLAFrame:(unsigned char)seqNo;
 - (int)waitForLDFrame;
+- (int)bufferedReceive:(unsigned char*)frame ofLength:(int)length;
 
 @end

@@ -19,5 +19,6 @@
 - (IBAction)scanForSerialDrivers:(id)sender;
 - (IBAction)selectDriver:(id)sender;
 - (IBAction)selectPackage:(id)sender;
+- (IBAction)recieveFromPackageBuddy:(id)sender;
 
 @end

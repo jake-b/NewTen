@@ -1,36 +1,39 @@
-{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
-{\fonttbl\f0\fswiss\fcharset77 Helvetica-Bold;\f1\fswiss\fcharset77 Helvetica;}
+{\rtf1\ansi\ansicpg1252\cocoartf1343\cocoasubrtf160
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
 {\colortbl;\red255\green255\blue255;}
-\pard\tx1440\tx2880\tx4320\tx5760\tx7200\ql\qnatural
+\viewkind0
+\pard\tx1440\tx2880\tx4320\tx5760\tx7200
 
-\f0\b\fs24 \cf0 NewTen 1.5.1 by Steven Frank\
+\f0\b\fs24 \cf0 NewTen 1.6\
+by Steven Frank\
+PackageBuddy support by Jake Bordens\
 Newton Connectivity for Mac OS X\
 
-\f1\b0 \
+\b0 \
 NewTen is a package installer for the Apple Newton MessagePad PDA.\
 \
 
-\f0\b Features:\
+\b Features:\
 
-\f1\b0 \
+\b0 \
 At the moment, NewTen provides only the ability to install packages on a Newton.  Hopefully over the time, other capabilities can be added.\
 \
 NewTen currently only supports serial connections.  This means you cannot use NewTen to install packages over ethernet or infrared.\
 \
 
-\f0\b Requirements:\
+\b Requirements:\
 
-\f1\b0 \
-Mac OS X 10.3 (Panther) or later\
+\b0 \
+Mac OS X 10.4 (Tiger) or later\
 Apple Newton MessagePad with serial cable\
 Newton Serial Dongle (for 2000-series MessagePads)\
 Serial adapter (such as KeySpan's Serial Adapters) with a Mac OS X /dev driver\
 \
 
-\f0\b Notes on compatibility:\
+\b Notes on compatibility:\
 
-\f1\b0 \
-I have a KeySpan USB Twin Serial adapter (USA-28X), and that is what I use for testing.  That is why these instructions are specific to the KeySpan adapter.\
+\b0 \
+I have a KeySpan USB Twin Serial adapter (USA-28X), and that is what I use for testing.  That is why these instructions are specific to the KeySpan adapter.  It has also been confirmed to work with a TRENDnet USB-to-Serial adapter and the Newton PC serial cable.\
 \
 Other serial adapters are known to work -- the main requirement is they must communicate via a driver in the Mac OS X /dev directory. \
 \
@@ -39,19 +42,19 @@ I've heard from users that the GeeThree serial adapter works, if you use the Bui
 If you have success with a particular serial adapter, you should drop me a note with details about your configuration.  My email address is in the "Credits" section below.\
   \
 
-\f0\b Setting up:\
+\b Setting up:\
 \
 
-\f1\b0 The first thing you must do is install the necessary Mac OS X drivers for your KeySpan serial adapter. \
+\b0 The first thing you must do is install the necessary Mac OS X drivers for your KeySpan serial adapter. \
 \
 The drivers can be found at their web site: http://www.keyspan.com/ in the "Downloads" section.  Be sure to get the Mac OS X version, and be absolutely sure you are downloading the correct version of the driver for the version of Mac OS X that you are using.\
 \
 Carefully follow KeySpan's instructions to install the driver.  A restart will probably be necessary, as the KeySpan driver is a low-level kernel extension.\
 \
 
-\f0\b Installing packages:\
+\b Installing packages:\
 
-\f1\b0 \
+\b0 \
 To install a Newton software package once you have the KeySpan driver installed, first launch NewTen by double-clicking its icon.\
 \
 You must now tell NewTen which serial port to use.  For example, if you have a KeySpan Twin Serial adapter (which has two serial ports), and it is plugged into USB port 2 of your computer, you should see two entries in the Serial Driver popup menu:\
@@ -72,38 +75,54 @@ When a sheet appears, reading "Waiting for Newton Dock connection...", pick up t
 If everything is set up correctly, the package should now transfer to the Newton.  A progress indicator shows you how far along the transfer is.  When the transfer is complete, the status will change to "Finished installing package", and the sheet will disappear.\
 \
 
-\f0\b Troubleshooting:\
+\b Receiving packages:\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
 
-\f1\b0 \
+\b0 \cf0 NewTen now supports receiving packages from PackageBuddy, a freeware application by Tactile.  PackageBuddy installs itself in the action menu of the extras drawer, as "Export to PC".   A dialog will appear asking if you are sending the package to a PC or Mac.  This was tested with a USB to DB9 serial adapter and a PC connection cable.  In this configuration, you must select "PC" from this menu as the "Mac" option is intended for older Macs that supported Apple Serial.  I am not sure how this works with the Keyspan Twin Serial Adapter.  YMMV.\
+\
+Steps to retrieve a package from your Newton:\
+\
+1. Highlight the package in the Extras drawer.\
+2. Select "Export to PC" from the action menu\
+3. In NewTen on your mac, click "Receive from PackageBuddy..."\
+4. Select "PC" and tap the connect button in PackageBuddy\
+5. When the transfer is complete, you will be prompted to save the file.\
+\pard\tx1440\tx2880\tx4320\tx5760\tx7200
+\cf0 \
 
-\f0\b No serial drivers are available!  My only choice is "None"!\
+\b Troubleshooting:\
 
-\f1\b0 \
+\b0 \
+
+\b No serial drivers are available!  My only choice is "None"!\
+
+\b0 \
 You probably have not installed (or installed incorrectly) the KeySpan drivers, or the serial adapter is not plugged into one of your computer's USB ports.  See above for more info.\
 \
 Note that the KeySpan drivers appear when the serial adapter is attached and disappear when the driver is detached.  Selecting "Re-scan for serial ports" from the NewTen menu will update the serial port list with the ports that are currently available.  For example, if you start NewTen before plugging in the adapter, you will need to re-scan before NewTen can "see" the adapter.\
 \
 
-\f0\b NewTen hangs "Setting up serial port..."! 
-\f1\b0 or
-\f0\b  \
+\b NewTen hangs "Setting up serial port..."! 
+\b0 or
+\b  \
 The Newton reports that it was not able to connect!\
 
-\f1\b0 \
+\b0 \
 You probably have the wrong serial driver selected.  Try a different selection.\
 \
 
-\f0\b NewTen hangs "Waiting for connection from Newton"!\
+\b NewTen hangs "Waiting for connection from Newton"!\
 \
 
-\f1\b0 You need to initiate the connection from the Newton side too.  See above for more info.\
+\b0 You need to initiate the connection from the Newton side too.  See above for more info.\
 \
 You may also be trying to initiate an infrared (IrDA) connection to the Newton, which is not currently possible.\
 \
 
-\f0\b Reporting bugs or problems:\
+\b Reporting bugs or problems:\
 
-\f1\b0 \
+\b0 \
 I have a limited amount of time available to provide support for free software, and must place most of my effort into the work that pays the bills (see http://www.panic.com/ for those products!)\
 \
 If all else fails, I can be reached at <stevenf@panic.com>\
@@ -119,9 +138,9 @@ The home page for UnixNPI is:\
 http://unixnpi.sourceforge.net/\
 \
 
-\f0\b Credits:\
+\b Credits:\
 
-\f1\b0 \
+\b0 \
 NewTen was written by Steven Frank (stevenf@panic.com)\
 \
 NewTen would not have been possible without the hard work of the developers of UnixNPI:\
@@ -133,19 +152,26 @@ NewTen's icon was created by John Schilling\
 NewTen is a derived work of UnixNPI, which is released under the GPL license.  This means full source code to NewTen is supplied with this distribution, and any derived work you create based on this source code must also in turn be released with full source code.  For full details, please read the COPYING file.\
 \
 
-\f0\b History:\
+\b History:\
+\
+1.6 (December 2014)\
+\
+
+\b0 - Added support for receiving packages sent by Tactile's Freeware "PackageBuddy".  Note that you must select "PC" not "Mac" from PackageBuddy.\
+
+\b \
 \
 1.5.1 (January 20, 2005)\
 \
 
-\f1\b0 - A very minor change to recognize Adriano Angelillis' NewtUSB adapter as "NewtUSB" instead of "USB-Serial Adapter"\
+\b0 - A very minor change to recognize Adriano Angelillis' NewtUSB adapter as "NewtUSB" instead of "USB-Serial Adapter"\
 \
 
-\f0\b \
+\b \
 1.5 (November 5, 2005)\
 \
 
-\f1\b0 - Updated for the latest Xcode\
+\b0 - Updated for the latest Xcode\
 \
 - Minimum OS requirement is now 10.3 (Panther)\
 \
@@ -162,11 +188,11 @@ NewTen is a derived work of UnixNPI, which is released under the GPL license.  T
 - All original UnixNPI code refactored into pure Objective-C\
 \
 
-\f0\b \
+\b \
 1.2 (Mar 9, 2003)\
 \
 
-\f1\b0 - Streamlined the user interface a bit\
+\b0 - Streamlined the user interface a bit\
 \
 - Updated for the latest ProjectBuilder\
 \
@@ -188,19 +214,19 @@ NewTen is a derived work of UnixNPI, which is released under the GPL license.  T
 \
 - New home page\
 
-\f0\b \
+\b \
 \
 1.1 (Feb 27, 2002)\
 
-\f1\b0 \
+\b0 \
 - NewTen will now list ANY tty.* or cu.* serial device, not just KeySpan devices.  NewTen reportedly works with the GeeThree stealth serial adapter, when used with tty.modem or cu.modem.\
 \
 - Added a "re-scan" button because I keep forgetting to plug-in the adapter BEFORE launching NewTen.\
 
-\f0\b \
+\b \
 \
 1.0 (Feb 23, 2002)\
 
-\f1\b0 \
+\b0 \
 - Initial version!  Lots of room for improvement, especially in ease-of-use, but I thought it important to get a version out quickly for comments and feedback.\
 }

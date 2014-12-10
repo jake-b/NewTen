@@ -26,6 +26,8 @@ static unsigned char lrFrame[] =
 - (void)updateStatus:(NSString*)statusText;
 - (void)updateProgress:(NSNumber*)current;
 - (void)updateProgressMax:(NSNumber*)maximum;
+- (void)showErrorMessage:(NSString*)message;
+- (void)recievePackagesThread;
 
 @end
 
@@ -504,12 +506,12 @@ bail:
 					{
 						// Don't know what this is, just show the raw device name
 						
-						[driverButton addItemWithTitle:[NSString stringWithCString:ent->d_name]];
+						[driverButton addItemWithTitle:[NSString stringWithCString:ent->d_name encoding:NSASCIIStringEncoding]];
 					}
 					
 					// Associate device name with this menu item
 					
-					[[driverButton lastItem] setRepresentedObject:[NSString stringWithCString:ent->d_name]];
+					[[driverButton lastItem] setRepresentedObject:[NSString stringWithCString:ent->d_name encoding:NSASCIIStringEncoding]];
 				}
 			}
 	
@@ -622,6 +624,242 @@ bail:
 //
 {
 	[status setStringValue:statusText];
+}
+
+
+- (void)showErrorMessage:(NSString*)message
+//
+// Displaya Critical Alert.  Dispatch to main thread.
+//
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert addButtonWithTitle:@"Acknowledged"];
+        [alert setMessageText:message];
+        [alert setAlertStyle:NSCriticalAlertStyle];
+        [alert beginSheetModalForWindow:mainWindow completionHandler:^(NSModalResponse returnCode) {}];
+    });
+}
+
+
+- (IBAction)recieveFromPackageBuddy:(id)sender
+//
+// Called when "Receive from PackageBuddy..." button is clicked.
+// Launches a new thread to do the actual task.
+//
+{
+    [NSApp beginSheet:sheet modalForWindow:mainWindow modalDelegate:nil didEndSelector:nil contextInfo:nil];
+    [NSThread detachNewThreadSelector:@selector(recievePackagesThread) toTarget:self withObject:nil];
+}
+
+- (void)recievePackagesThread
+//
+// Called when "Receive from PackageBuddy..." button is clicked.
+//
+{
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    
+    unsigned char ltSeqNo = 0;
+    
+    static char* DRNK  = "DRNK\x04";
+    static char* SPIT  = "SPIT";
+    static char* START = "START\x04";
+    static char* OK    = "OK\x04";
+    
+    NSUInteger totalBytesRcvd = 0;
+    
+    unsigned char recvBuf[MAX_HEAD_LEN + MAX_INFO_LEN];
+    
+    NSFileManager* manager = [NSFileManager defaultManager];
+    
+    // Set progress indeterminate
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [progress setIndeterminate:YES];
+        [progress startAnimation:nil];
+    });
+    
+    // Reset giveUp
+    giveUp = NO;
+    
+    // Get a temporary file
+    NSString *tempFileTemplate = [NSTemporaryDirectory() stringByAppendingPathComponent:@"NewTen-PKG.XXXXXX"];
+    const char *tempFileTemplateCString = [tempFileTemplate fileSystemRepresentation];
+    NSMutableData*  tempFileBuffer = [NSMutableData dataWithBytes:tempFileTemplateCString length:strlen(tempFileTemplateCString)+1];
+    int fileDescriptor = mkstemp([tempFileBuffer mutableBytes]);
+    
+    if (fileDescriptor == -1) {
+        [self showErrorMessage:@"Unable to create temporary file."];
+        goto bail;
+    }
+    
+    // Save the filename for later
+    NSString* tempFileName = [[[NSString alloc] initWithData:tempFileBuffer encoding:NSUTF8StringEncoding] autorelease];
+    NSURL* tempFileURL = [NSURL fileURLWithPath:tempFileName];
+    
+    // Open the connection to the Newton
+    NSMenuItem* item = [driverButton itemAtIndex:[driverButton indexOfSelectedItem]];
+    NSString* devicePath = [NSString stringWithFormat:@"/dev/%s",
+                            [[item representedObject] fileSystemRepresentation]];
+    
+    connection = [NewtonConnection connectionWithDevicePath:devicePath speed:38400];
+    
+    [self performSelectorOnMainThread:@selector(updateStatus:)
+                           withObject:@"Select \"PC\" type in PackageBuddy and begin serial connection..."
+                        waitUntilDone:YES];
+    
+    // Wait for initial connection
+    while ( [connection receiveFrame:recvBuf] < 0 ) {
+        if ( giveUp )
+            goto bail;
+    }
+    
+    [self performSelectorOnMainThread:@selector(updateStatus:)
+                           withObject:@"Handshaking..."
+                        waitUntilDone:YES];
+    
+    do {
+        [connection sendFrame:NULL header:lrFrame length:0];
+    } while ( [connection waitForLAFrame:ltSeqNo] < 0 && !giveUp );
+    
+    if ( giveUp )
+        goto bail;
+    
+    ++ltSeqNo;
+    
+    // Send the DRNK command until we get an ACK.  DRNK is PackageBuddy's PING and SPIT is its PONG.
+    // Do this sequence once just to make sure we've got PackageBuddy on the other end
+    do {
+        [connection sendLTFrame:(unsigned char*)DRNK length:strlen(DRNK) seqNo:ltSeqNo];
+        if ( giveUp )
+            goto bail;
+    } while ( [connection waitForLAFrame:ltSeqNo] < 0 );
+    
+    ltSeqNo++; // Increment the sequence
+    
+    // Wait for the response
+    //while ( [connection receiveFrame:recvBuf] < 0 || (recvBuf[1] != '\x04')) {}
+    [connection bufferedReceive:recvBuf ofLength:4];
+    
+    if ( giveUp )
+        goto bail;
+    
+    // Vefify we got a SPIT back.
+    if (memcmp(SPIT, recvBuf, 4) != 0) {
+        [self showErrorMessage:@"Unexpected response from the Newton.  Transfer failed."];
+        NSLog(@"Error: Unexpected response to DRNK command.");
+        char uResp[5];
+        memcpy(uResp, &recvBuf[3],4);
+        uResp[4]=0;
+        NSLog(@"\tGot %s expected SPIT", uResp);
+        goto bail;
+    }
+    
+    [self performSelectorOnMainThread:@selector(updateStatus:)
+                           withObject:@"Beginning transfer..."
+                        waitUntilDone:YES];
+    
+    do {
+        [connection sendLTFrame:(unsigned char*)START length:strlen(START) seqNo:ltSeqNo];
+        
+        if ( giveUp )
+            goto bail;
+        
+    } while ( [connection waitForLAFrame:ltSeqNo] < 0 );
+    ltSeqNo++; // Increment sequence
+    
+    do {
+        // Wait for the response
+        [connection bufferedReceive:recvBuf ofLength:4];
+        
+        if ( giveUp )
+            goto bail;
+        
+        // Check the command
+        if (memcmp("END ", recvBuf, 4) == 0) {
+            break;
+        } else if (memcmp("ENTR", recvBuf, 4) != 0) {
+            [self showErrorMessage:@"Unexpected response from the Newton.  Transfer failed."];
+            NSLog(@"Error: Unexpected response to START or OK command.");
+            char uResp[5];
+            memcpy(uResp, &recvBuf[3],4);
+            uResp[4]=0;
+            NSLog(@"\tGot %s expected ENTR or OK", uResp);
+            return;
+        }
+        
+        // If we're a ENTR command, get the length
+        [connection bufferedReceive:recvBuf ofLength:4];
+        
+        if ( giveUp )
+            goto bail;
+        
+        // Change the byte order
+        uint32_t length = *((uint32_t*)recvBuf);
+        length = CFSwapInt32BigToHost(length);
+        
+        // Wait for the DATA frame
+        [connection bufferedReceive:recvBuf ofLength:length];
+        
+        if ( giveUp )
+            goto bail;
+        
+        write(fileDescriptor, recvBuf, length);
+        
+        totalBytesRcvd += length;
+        
+        [self performSelectorOnMainThread:@selector(updateStatus:)
+                               withObject:[NSString stringWithFormat:@"Received %ld bytes...", totalBytesRcvd]
+                            waitUntilDone:YES];
+        
+        // Send OK to get the next packet
+        do {
+            [connection sendLTFrame:(unsigned char*)OK length:strlen(OK) seqNo:ltSeqNo];
+            if ( giveUp )
+                goto bail;
+            
+        } while ( [connection waitForLAFrame:ltSeqNo] < 0 );
+        ltSeqNo++; // Increment sequence
+        
+        if ( giveUp )
+            goto bail;
+    } while (1);
+    
+    close(fileDescriptor), fileDescriptor = -1;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSSavePanel* panel = [NSSavePanel savePanel];
+        panel.allowedFileTypes = [NSArray arrayWithObjects:@"pkg", @"PKG", @"Pkg", @"newtonpackage", nil];
+        
+        [panel beginWithCompletionHandler:^(NSInteger result) {
+            if (result == NSFileHandlingPanelOKButton) {
+                NSURL* destURL = [panel URL];
+                
+                // then copy a previous file to the new location.
+                // if the file exists, need to delete it first or copyItemAtURL fails.
+                // Save Panel should prompt if file exists.
+                if ([manager fileExistsAtPath:[destURL path]]) {
+                    [manager removeItemAtURL:destURL error:nil];
+                }
+                [manager copyItemAtURL:tempFileURL toURL:destURL error:nil];
+                [manager removeItemAtURL:tempFileURL error:nil];
+            }
+        }];
+    });
+    
+bail:
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [progress stopAnimation:nil];
+        [progress setIndeterminate:NO];
+        [self hideInstallSheet];
+    });
+    
+    // Close the file if necessary
+    if (fileDescriptor != -1)
+        close(fileDescriptor);
+    
+    [connection disconnect];
+    // Release the pool
+    [pool release];
 }
 
 

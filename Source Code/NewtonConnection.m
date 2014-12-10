@@ -122,6 +122,10 @@
 		// Update the new device settings 
 		
 		tcsetattr(newtFD, TCSANOW, &newtTTY);
+        
+        // Create the circular buffer
+        
+        TPCircularBufferInit(&inBuffer, 512);
 	}
 	
 	return self;
@@ -135,6 +139,8 @@
 	if ( newtFD >= 0 )
 		close(newtFD);
 	
+    TPCircularBufferCleanup(&inBuffer);
+    
 	[super dealloc];
 }
 
@@ -301,7 +307,7 @@
 	if ( frame[1] == '\x02' )
 		return -1;//ErrHandler("Newton device disconnected, connection stopped!!");
 		
-	return 0;
+	return i;
 }
 
 
@@ -540,6 +546,39 @@
 		return -1;
 
 	return 0;
+}
+
+- (int)bufferedReceive:(unsigned char*)frame ofLength:(int)length
+{
+    int32_t availableBytes = 0;
+    unsigned char recvBuf[MAX_HEAD_LEN + MAX_INFO_LEN];
+    
+    TPCircularBufferTail(&inBuffer, &availableBytes);
+    
+    while (availableBytes < length) {
+        int recvBytes;
+        
+        if ( canceled )
+            return -1;
+        
+        // Wait for the response
+        while ( (recvBytes = [self receiveFrame:recvBuf]) < 0 || (recvBuf[1] != '\x04')) {
+            if ( canceled )
+                return -1;
+        }
+        
+        // Send the Ack
+        [self sendLAFrame:recvBuf[2]];
+        
+        TPCircularBufferProduceBytes(&inBuffer, &recvBuf[3], recvBytes-3);
+        availableBytes += recvBytes - 3;
+    }
+    
+    uint8_t* tail = TPCircularBufferTail(&inBuffer, &availableBytes);
+    memcpy(frame, tail, length);
+    TPCircularBufferConsume(&inBuffer, length);
+    
+    return 0;
 }
 
 @end
